@@ -1,0 +1,1 @@
+./Server-Status.ps1 -List C:\inyayam_scripts\powershell\ServerList.txt -O C:\inyayam_scripts\powershell\Scripts -DiskAlert 85 -CpuAlert 80 -MemAlert 80 -Refresh 120

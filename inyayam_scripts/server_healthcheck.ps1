@@ -1,5 +1,5 @@
 #################################################################################  
-##  
+## The purpose  
 ## Server Health Check  
 ## This scripts check the server Avrg CPU and Memory utlization along with C drive  
 ## disk utilization and sends an email to the receipents included in the script 
@@ -17,13 +17,36 @@ $OS = gwmi -Class win32_operatingsystem -computername $computername |
 Select-Object @{Name = "MemoryUsage"; Expression = {“{0:N2}” -f ((($_.TotalVisibleMemorySize - $_.FreePhysicalMemory)*100)/ $_.TotalVisibleMemorySize) }} 
 $vol = Get-WmiObject -Class win32_Volume -ComputerName $computername -Filter "DriveLetter = 'C:'" | 
 Select-object @{Name = "C PercentFree"; Expression = {“{0:N2}” -f  (($_.FreeSpace / $_.Capacity)*100) } } 
+
+## Get Uptime
+$UPTIME=Get-WmiObject Win32_OperatingSystem
+$up = [Management.ManagementDateTimeConverter]::ToDateTime($UPTIME.LastBootUpTime) | Out-String
+
+## Get version
+$Version = (Get-WmiObject -class Win32_OperatingSystem).Caption | Out-String
+
+## Get Uptime
+$UPTIME=Get-WmiObject Win32_OperatingSystem
+$up = [Management.ManagementDateTimeConverter]::ToDateTime($UPTIME.LastBootUpTime) | Out-String
+
+## Get Disk Spaces
+$Disk = Get-WmiObject Win32_logicaldisk -ComputerName LocalHost -Filter "DriveType=3" |select -property DeviceID,@{Name="Size(GB)";Expression={[decimal]("{0:N0}" -f($_.size/1gb))}},@{Name="Free Space(GB)";Expression={[decimal]("{0:N0}" -f($_.freespace/1gb))}},@{Name="Free (%)";Expression={"{0,6:P0}" -f(($_.freespace/1gb) / ($_.size/1gb))}}|ConvertTo-Html
+
+## Get Critical Service Status here i have given SQL service you can pass different service name as per your requirement
+$Private:wmiService =gsv -include "*SQL*" -Exclude "*ySQL*","*spo*"|select Name,DisplayName,Status|ConvertTo-Html
+$Services =gsv -include "*SQL*" -Exclude "*ySQL*","*spo*"|select Name,DisplayName,Status|ConvertTo-Html 
+
+## Get CPU Utilization
+$CPU_Utilization = Get-Process|Sort-object -Property CPU -Descending| Select -first 5 -Property ID,ProcessName,@{Name = 'CPU In (%)';Expression = {$TotalSec = (New-TimeSpan -Start $_.StartTime).TotalSeconds;[Math]::Round( ($_.CPU * 100 /$TotalSec),2)}},@{Expression={$_.threads.count};Label="Threads";},@{Name="Mem Usage(MB)";Expression={[math]::round($_.ws / 1mb)}},@{Name="VM(MB)";Expression={"{0:N3}" -f($_.VM/1mb)}}|ConvertTo-Html
+
    
 $result += [PSCustomObject] @{  
         ServerName = "$computername" 
         CPULoad = "$($AVGProc.Average)%" 
         MemLoad = "$($OS.MemoryUsage)%" 
-        CDrive = "$($vol.'C PercentFree')%" 
-    } 
+        CDrive = "$($vol.'C PercentFree')%"
+		DDrive = "$($vol.'D PercentFree')%"
+	} 
  
     $Outputreport = "<HTML><TITLE> Server Health Report </TITLE> 
                      <BODY background-color:peachpuff> 
@@ -53,17 +76,14 @@ $result += [PSCustomObject] @{
         }  
   
 $Outputreport | out-file C:\inyayam_scripts\powershell\Scripts\Test.htm  
-Invoke-Expression C:\inyayam_scripts\powershell\Scripts\Test.htm 
+Invoke-Expression C:\inyayam_scripts\powershell\Scripts\Test.htm
 
-##	Send email functionality from below line, use it if you want    
-##	$smtpServer = "yoursmtpserver.com" 
-##	$smtpFrom = "fromemailaddress@test.com" 
-##	$smtpTo = "receipentaddress@test.com" 
-##	$messageSubject = "Servers Health report" 
-##	$message = New-Object System.Net.Mail.MailMessage $smtpfrom, $smtpto 
-##	$message.Subject = $messageSubject 
-##	$message.IsBodyHTML = $true 
-##	$message.Body = "<head><pre>$style</pre></head>" 
-##	$message.Body += Get-Content C:\scripts\test.htm 
-##	$smtp = New-Object Net.Mail.SmtpClient($smtpServer) 
-##	$smtp.Send($message)
+# Get-Content "C:\inyayam_scripts\powershell\Scripts\Test.htm" -Wait -Tail 5
+
+#### ayman tail the script
+## Create an Timer instance 
+#infinite loop for calling connect function   
+#$job = Start-Job -ScriptBlock { & "server_healthcheck.ps1" }
+
+# Get-Content "some_logfile.log" -Wait
+
