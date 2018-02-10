@@ -1,13 +1,7 @@
-
-
-#this is two separate scripts which must be run in Tandem all files need to be in the same directory
-
-################################ Script 1. ############################################
-
 ###################### Monitor Script ###########################
-# By Ryan Jones                                                 #
+# INYAYAM                                                		#
 # This is the script which will run the monitor script          #
-# You can call this what you would like I call it Run This.ps1  #
+# 																#
 # Change details (if required) anywhere you see **CHANGE THIS** #
 #################################################################
  $date = Get-Date
@@ -15,58 +9,13 @@
  $m = $date.month
  $y = $date.year
 #**CHANGE THIS** Set the location the report is saved to (must exist)
-$File ="C:\monitor\report_$d.$m.$y.txt"
+$File ="C:\inyayam_scripts\powershell\Script_log\$computersname.$d.$m.$y.txt"
 
 "Running Reports"
 .\monitor.ps1 | out-file -filepath $File -append
 
-"Sending Email"
-#**CHANGE THIS** change these to what you require
-$EmailFrom = "something@yourdomain.com"
-$EmailTo = "something@yourdomain.com"
-$EmailSubject = "Server Reports" 
-$emailbody = @"
-               D A I L Y  S E R V E R  R E P O R T
 
-Attached is the daily server report for the $d/$m/$y please check and review issues.
-
-"@
-#**CHANGE THIS** change this to your SMTP server 
-$SMTPServer = "mail.yourdomain.com"
-
-$emailattachment = $file
-
-function send_email {
-$mailmessage = New-Object system.net.mail.mailmessage
-$mailmessage.from = ($emailfrom)
-$mailmessage.To.add($emailto)
-$mailmessage.Subject = $emailsubject
-$mailmessage.Body = $emailbody
-
-$attachment = New-Object System.Net.Mail.Attachment($emailattachment, 'text/plain')
-  $mailmessage.Attachments.Add($attachment)
-
-
-#$mailmessage.IsBodyHTML = $true
-$SMTPClient = New-Object Net.Mail.SmtpClient($SmtpServer, 25) 
-$SMTPClient.Send($mailmessage)
-}
-send_email
-"Email Sent"
-
-#################################### Script 2. ########################################
-
-###################### Monitor Script ###########################
-# By Ryan Jones                                                 #
-# This is the monitor script                                    #
-# This script must be called monitor.ps1                        #
-# You will need to create a txt file called computers.txt       #
-# The file needs to be in the same directory                    #
-# the Format of the file is one computer name per line          #
-# Change details (if required) anywhere you see **CHANGE THIS** #
-#################################################################
-# **CHANGE THIS** 
-$listloc="C:\somefolder\computers.txt";
+$listloc="C:\inyayam_scripts\powershell\ServerList.txt";
 $computers=Get-Content $listloc
  $date = Get-Date
  $d = $date.day
@@ -118,7 +67,6 @@ $cpuuage=get-CPUUSAGE
  
 ""
 "=== S T A R T  R E P O R T ==="
-""
 ""
 
 foreach ($computersname in $computers) { 
@@ -236,8 +184,3 @@ Format-Table -AutoSize @(
  }
     ""
    "=== E N D  O F  R E P O R T ==="
-
-
-
-
-Screenshots
