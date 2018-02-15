@@ -1,0 +1,51 @@
+
+#####################################################################
+    Health Check Report (CPU,Process,Disk Usage, Memory)
+#####################################################################
+Hostname         : L0140861
+Kernel Version   : 2.9.0(0.318/5/3)
+Uptime           : 
+Last Reboot Time : 
+
+*********************************************************************
+							CPU Load 
+*********************************************************************
+
+Please install mpstat!
+On Debian based systems:
+sudo apt-get install sysstat
+On RHEL based systems:
+yum install sysstat
+
+*********************************************************************
+                             Process
+*********************************************************************
+
+=> Top memory using processs/application
+
+PID %MEM RSS COMMAND
+1 13924 1544000 
+10392 10976 1544000 
+10976 10760 1544000 
+13924 4212 1544000 
+4228 10468 1544000 
+PPID WINPID UID 
+
+=> Top CPU using process/application
+
+
+*********************************************************************
+							Disk Usage 
+*********************************************************************
+
+C:/Users/inyayam/AppData/Local/Programs/Git / 35% used 110G free space
+
+P: /p 73% used 20G free space
+
+R: /r 73% used 20G free space
+
+
+
+Heath Status
+
+C:/Users/inyayam/AppData/Local/Programs/Git / 		 Normal

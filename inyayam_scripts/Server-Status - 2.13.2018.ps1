@@ -63,20 +63,23 @@ Function Get-UpTime
 
 ## Begining of the loop. Lower down the loop is broken if the refresh option is not configured.
 Do{
-#    loop body instructions
-#}
-#while/until(condition)
 
-    ## Change value of the following parameter as needed
-#	$OutputFile = "C:\inyayam_scripts\powershell\Scripts\WinServ-Status-Report.htm"
+## Change value of the following parameter as needed
+	$OutputFile = "C:\inyayam_scripts\powershell\Scripts\WinServ-Status-Report.htm"
     $ServerListFile = "C:\inyayam_scripts\powershell\ServerList.txt"  
     $ServerName = Get-Content $ServerName -ErrorAction SilentlyContinue 
     $Result = @() 
 
 ## Look through the servers in the file provided
 #    ForEach ($ServerName in $ServerName)
-	ForEach ($ComputerName in $ServerName)
-    {
+	ForEach($computername in $ServerList)  
+{ 
+#	ForEach ($ServerName in (get-content "C:\inyayam_scripts\powershell\ServerList.txt"))
+
+#	{Get-Service "Windows Event Log" -ComputerName $ServerName | Select @{Name="Server";Expression={$ServerName}},Name,Status,DisplayName
+
+#	}
+   }
         $PingStatus = Test-Connection -ComputerName $ServerName -Count 1 -Quiet
 
         ## If server responds, get uptime and disk info
@@ -89,36 +92,13 @@ Do{
             $Uptime = Get-Uptime($OperatingSystem.LastBootUpTime)
             $MemAlert = $false
             $MemUsage = Get-WmiObject -Class Win32_OperatingSystem -ComputerName $ServerName | ForEach-Object {“{0:N0}” -f ((($_.TotalVisibleMemorySize - $_.FreePhysicalMemory) * 100)/ $_.TotalVisibleMemorySize); If((($_.TotalVisibleMemorySize - $_.FreePhysicalMemory) * 100)/ $_.TotalVisibleMemorySize -ge $MemAlertThreshold){$MemAlert = $True}; "%"}
+
             $DiskAlert = $false
             $DiskUsage = Get-WmiObject Win32_LogicalDisk -ComputerName $ServerName | Where-Object {$_.DriveType -eq 3} | Foreach-Object {$_.DeviceID, [Math]::Round((($_.Size - $_.FreeSpace) * 100)/ $_.Size); If([Math]::Round((($_.Size - $_.FreeSpace) * 100)/ $_.Size) -ge $DiskAlertThreshold){$DiskAlert = $True}; "%"}
             $IPv4Address = Get-WmiObject Win32_NetworkAdapterConfiguration -ComputerName $ServerName | Select-Object -Expand IPAddress | Where-Object { ([Net.IPAddress]$_).AddressFamily -eq "InterNetwork" }
 #			$ErrorAction = Get-WinEvent -FilterHashTable | ForEach-Object @{LogName='Application'; Level=2; StartTime=(Get-Date).AddDays(-3) $ErrorAction = $True}; "-#"}
-				
 		}
-	
-        ## Put the results together
-        $Result += [PSCustomObject] @{
-#        $Result += New-Object PSObject -Property @{
-	        ServerName = $ServerName
-		    IPV4Address = $IPv4Address
-		    Status = $PingStatus
-            CpuUsage = $CpuUsage
-            CpuAlert = $CpuAlert
-		    Uptime = $Uptime
-            MemUsage = $MemUsage
-            MemAlert = $MemAlert
-			CpuData = $CpuData
-#			EventLogs = $ErrorAction
-	    }
 
-        ## Clear the variables after obtaining and storing the results so offline servers don't have duplicate info.
-    }	Clear-Variable IPv4Address
-        Clear-Variable Uptime
-        Clear-Variable MemUsage
-        Clear-Variable CpuUsage
-		Clear-Variable CpuData
-#		Clear-Variable EventLogs
-    
 # Event Logs
 #	  Get-WinEvent -FilterHashTable @{LogName='Application'; Level=2; StartTime=(Get-Date).AddDays(-3)}
         $css= "<style>"
@@ -129,7 +109,6 @@ Do{
         $css= $css+  "TD:hover{ background-color:#004466;}"
         $css= $css+ "</style>" 
         Get-WinEvent -FilterHashTable @{LogName='Application'; Level=2; StartTime=(Get-Date).AddDays(-3)}
-
         $ServerName=Get-Content("C:\inyayam_scripts\powershell\ServerList.txt")
         $body =@()
 
@@ -139,21 +118,45 @@ Do{
     }
         $body | ConvertTo-HTML -Head $css MachineName,ID,LevelDisplayName,TimeCreated,Message > C:\inyayam_scripts\powershell\Scripts\eventlogs.htm
   
+
 ## If there is a result put the HTML file together.
     If ($Result -ne $null)
   {
+       ## Put the results together
+        $Result += New-Object PSObject -Property @{
+	        ServerName = $ServerName
+		    IPV4Address = $IPv4Address
+		    Status = $PingStatus
+            CpuUsage = $CpuUsage
+            CpuAlert = $CpuAlert
+		    Uptime = $Uptime
+            MemUsage = $MemUsage
+            MemAlert = $MemAlert
+            DiskUsage = $DiskUsage
+            DiskAlert = $DiskAlert
+	    }
 
-	
-#		$HTML><TITLE> Server Health Report </TITLE>
-		$HTML = '<style type="text/css">
+        ## Clear the variables after obtaining and storing the results so offline servers don't have duplicate info.
+        Clear-Variable IPv4Address
+        Clear-Variable Uptime
+        Clear-Variable MemUsage
+        Clear-Variable CpuUsage
+        Clear-Variable DiskUsage
+    }
+
+
+## If there is a result put the HTML file together.
+    If ($Result -ne $null)
+    {
+        $HTML = '<style type="text/css">
                 p {font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;font-size:14px}
                 p {color:#ffffff;}
                 #Header{font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;width:100%;border-collapse:collapse;}
                 #Header td, #Header th {font-size:15px;text-align:left;border:1px solid #1a1a1a;padding:2px 2px 2px 7px;color:#ffffff;}
-	            #Header th {font-size:16px;text-align:center;padding-top:5px;padding-bottom:4px;background-color:#a43f6c;color:#ffffff;}
+	            #Header th {font-size:16px;text-align:center;padding-top:5px;padding-bottom:4px;background-color:#4B4B4B;color:#ffffff;}
 	            #Header tr.alt td {color:#ffffff;background-color:#eaf2d3;}
-                #Header tr:nth-child(even) {background-color:#a43f6c;}
-                #Header tr:nth-child(odd) {background-color:#a43f6c;}
+                #Header tr:nth-child(even) {background-color:#4B4B4B;}
+                #Header tr:nth-child(odd) {background-color:#4B4B4B;}
                 body {background-color: #1a1a1a;}
 	            </style>
                 <head><meta http-equiv="refresh" content="30"></head>'
@@ -162,33 +165,29 @@ Do{
             <table border=1 cellpadding=0 cellspacing=0 id=header>
             <tr>
                 <th><b><font color=#e6e6e6>Server</font></b></th>
-                <th><b><font color=#e6e6e6>Server IP</font></b></th>
+                <th><b><font color=#e6e6e6>IP</font></b></th>
                 <th><b><font color=#e6e6e6>Status</font></b></th>
                 <th><b><font color=#e6e6e6>CPU Usage</font></b></th>
                 <th><b><font color=#e6e6e6>Memory Usage</font></b></th>
-#                <th><b><font color=#e6e6e6>Disk Usage</font></b></th>
+                <th><b><font color=#e6e6e6>Disk Usage</font></b></th>
                 <th><b><font color=#e6e6e6>Uptime</font></b></th>
             </tr>"
 
-
-## Highlight the alerts if the alerts are triggered.
+        ## Highlight the alerts if the alerts are triggered.
         ForEach($Entry in $Result)
         {
             If ($Entry.Status -eq $True)
             {
-			#ServerName
                 $HTML += "<td><font color=#00e600>$($Entry.ServerName)</font></td>"
             }
 
             Else
             {
-			#ServerName
                 $HTML += "<td><font color=#FF4D4D>&#10008 $($Entry.ServerName)</font></td>"
             }
 
             If ($Entry.Status -eq $True)
             {
-			#IPV4Address
                 $HTML += "<td><font color=#00e600>$($Entry.IPV4Address)</font></td>"
             }
 
@@ -211,13 +210,11 @@ Do{
             {
                 If ($Entry.CpuAlert -eq $True)
                 {
-				#CpuUsage
                     $HTML += "<td><font color=#ffff4d>&#9888 $($Entry.CpuUsage)</font></td>"
                 }
 
                 Else
                 {
-				#CpuUsage
                     $HTML += "<td><font color=#00e600>&#10004 $($Entry.CpuUsage)</font></td>"
                 }
             }
@@ -231,13 +228,11 @@ Do{
             {
                 If ($Entry.MemAlert -eq $True)
                 {
-				#MemUsage
                     $HTML += "<td><font color=#ffff4d>&#9888 $($Entry.MemUsage)</font></td>"
                 }
 
                 Else
                 {
-				#MemUsage
                     $HTML += "<td><font color=#00e600>&#10004 $($Entry.MemUsage)</font></td>"
                 }
             }
@@ -247,23 +242,48 @@ Do{
                 $HTML += "<td><font color=#FF4D4D>&#10008 Offline</font></td>"
             }
 
+            If ($Entry.DiskUsage -ne $null)
+            {
+                If ($Entry.DiskAlert -eq $True)
+                {
+                    $HTML += "<td><font color=#ffff4d>&#9888 $($Entry.DiskUsage)</font></td>"
+                }
 
+                Else
+                {
+                    $HTML += "<td><font color=#00e600>&#10004 $($Entry.DiskUsage)</font></td>"
+                }
+            }
+
+            Else
+            {
+                $HTML += "<td><font color=#FF4D4D>&#10008 Offline</font></td>"
+            }
+
+            If ($Entry.Status -eq $True)
+            {
+                $HTML += "<td><font color=#00e600>$($Entry.Uptime)</font></td>
+                          </tr>"
+            }
+
+            Else
+            {
+                $HTML += "<td><font color=#FF4D4D>&#10008 Offline</font></td>
+                          </tr>"
             }
         }
-
-        ## Report the date and time the script ran.
+	
+## Report the date and time the script ran.
         $HTML += "</table><p><font color=#e6e6e6>Status refreshed on: $(Get-Date -Format G)</font></p></body></html>"
 #>
         ## Output the HTML file
 	    #$HTML | Out-File $OutputFile
-		
-		
 #		$Outputreport | out-file C:\inyayam_scripts\powershell\Scripts\WinServ-Status-Report.htm  
 
 #		$Outputreport = C:\inyayam_scripts\powershell\Scripts\WinServ-Status-Report.htm
 #		Invoke-Expression C:\inyayam_scripts\powershell\Scripts\WinServ-Status-Report.htm
 
-        $HTML | Out-File $OutputFile
+       $HTML | Out-File $OutputFile
 #		$Outputreport +
         ## If the refresh time option is configured, wait the specifed number of seconds then loop.
  <#       If ($RefreshTime -ne $null)
@@ -282,6 +302,8 @@ do{
 
 ## This will keep refreshing every "2" minutes and time option is not configured, stop the loop.
 Until ($RefreshTime -eq $null)
-
-
+        
+            
 ## End
+
+
