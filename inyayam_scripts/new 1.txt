@@ -1,0 +1,78 @@
+        ForEach($Entry in $Result)
+        {
+            If ($Entry.Status -eq $True)
+            {
+#ServerName
+                $HTML += "<tr><font color=#00e600>$($Entry.ServerName)</font></tr>"
+            }
+
+            Else
+            {
+#ServerName
+                $HTML += "<tr><font color=#FF4D4D>&#10008 $($Entry.ServerName)</font></tr>"
+            }
+
+            If ($Entry.Status -eq $True)
+            {
+#IPV4Address
+                $HTML += "<tr><font color=#00e600>$($Entry.IPV4Address)</font></tr>"
+            }
+
+            Else
+            {
+                $HTML += "<tr><font color=#FF4D4D>&#10008 Offline</font></tr>"
+            }
+
+            If ($Entry.Status -eq $True)
+            {
+                $HTML += "<tr><font color=#00e600>&#10004 Online</font></tr>"
+            }
+
+            Else
+            {
+                $HTML += "<tr><font color=#FF4D4D>&#10008 Offline</font></tr>"
+            }
+
+            If ($Entry.CpuUsage -ne $null)
+            {
+                If ($Entry.CpuAlert -eq $True)
+                {
+#CpuUsage
+                    $HTML += "<tr><font color=#ffff4d>&#9888 $($Entry.CpuUsage)</font></tr>"
+                }
+
+                Else
+                {
+#CpuUsage
+                    $HTML += "<tr><font color=#00e600>&#10004 $($Entry.CpuUsage)</font></tr>"
+                }
+            }
+        
+            Else
+            {
+                $HTML += "<tr><font color=#FF4D4D>&#10008 Offline</font></tr>"
+            }
+
+            If ($Entry.MemUsage -ne $null)
+            {
+                If ($Entry.MemAlert -eq $True)
+                {
+#MemUsage
+                    $HTML += "<tr><font color=#ffff4d>&#9888 $($Entry.MemUsage)</font></tr>"
+                }
+
+                Else
+                {
+#MemUsage
+                    $HTML += "<tr><font color=#00e600>&#10004 $($Entry.MemUsage)</font></tr>"
+                }
+            }
+
+            Else
+            {
+                $HTML += "<tr><font color=#FF4D4D>&#10008 Offline</font></tr>"
+            }
+
+
+            }
+        }

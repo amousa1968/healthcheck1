@@ -63,9 +63,6 @@ Function Get-UpTime
 
 ## Begining of the loop. Lower down the loop is broken if the refresh option is not configured.
 Do{
-#    loop body instructions
-#}
-#while/until(condition)
 
     ## Change value of the following parameter as needed
 #	$OutputFile = "C:\inyayam_scripts\powershell\Scripts\WinServ-Status-Report.htm"
@@ -108,7 +105,7 @@ Do{
             MemUsage = $MemUsage
             MemAlert = $MemAlert
 			CpuData = $CpuData
-#			EventLogs = $ErrorAction
+
 	    }
 
         ## Clear the variables after obtaining and storing the results so offline servers don't have duplicate info.

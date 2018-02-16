@@ -1,6 +1,2 @@
 Browser
 WinRM
-jira
-bamboo
-bitbucket
-jenkins

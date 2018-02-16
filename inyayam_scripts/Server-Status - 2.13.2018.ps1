@@ -71,14 +71,8 @@ Do{
     $Result = @() 
 
 ## Look through the servers in the file provided
-#    ForEach ($ServerName in $ServerName)
 	ForEach($computername in $ServerList)  
 { 
-#	ForEach ($ServerName in (get-content "C:\inyayam_scripts\powershell\ServerList.txt"))
-
-#	{Get-Service "Windows Event Log" -ComputerName $ServerName | Select @{Name="Server";Expression={$ServerName}},Name,Status,DisplayName
-
-#	}
    }
         $PingStatus = Test-Connection -ComputerName $ServerName -Count 1 -Quiet
 
@@ -96,11 +90,10 @@ Do{
             $DiskAlert = $false
             $DiskUsage = Get-WmiObject Win32_LogicalDisk -ComputerName $ServerName | Where-Object {$_.DriveType -eq 3} | Foreach-Object {$_.DeviceID, [Math]::Round((($_.Size - $_.FreeSpace) * 100)/ $_.Size); If([Math]::Round((($_.Size - $_.FreeSpace) * 100)/ $_.Size) -ge $DiskAlertThreshold){$DiskAlert = $True}; "%"}
             $IPv4Address = Get-WmiObject Win32_NetworkAdapterConfiguration -ComputerName $ServerName | Select-Object -Expand IPAddress | Where-Object { ([Net.IPAddress]$_).AddressFamily -eq "InterNetwork" }
-#			$ErrorAction = Get-WinEvent -FilterHashTable | ForEach-Object @{LogName='Application'; Level=2; StartTime=(Get-Date).AddDays(-3) $ErrorAction = $True}; "-#"}
+
 		}
 
 # Event Logs
-#	  Get-WinEvent -FilterHashTable @{LogName='Application'; Level=2; StartTime=(Get-Date).AddDays(-3)}
         $css= "<style>"
         $css= $css+ "BODY{ text-align: center; background-color:white;}"
         $css= $css+ "TABLE{    font-family: 'Lucida Sans Unicode', 'Lucida Grande', Sans-Serif;font-size: 12px;margin: 10px;width: 100%;text-align: center;border-collapse: collapse;border-top: 7px solid #004466;border-bottom: 7px solid #004466;}"
@@ -112,13 +105,12 @@ Do{
         $ServerName=Get-Content("C:\inyayam_scripts\powershell\ServerList.txt")
         $body =@()
 
-        foreach ($strComputer in $ServerName) 
+        foreach ($computername in $ServerName) 
         {
-        $body += Get-WinEvent -ComputerName $strComputer -FilterHashtable @{logname="System"; Level=2; starttime=$StartDate} -ErrorAction SilentlyContinue
+        $body += Get-WinEvent -ComputerName $computername -FilterHashtable @{logname="System"; Level=2; starttime=$StartDate} -ErrorAction SilentlyContinue
     }
         $body | ConvertTo-HTML -Head $css MachineName,ID,LevelDisplayName,TimeCreated,Message > C:\inyayam_scripts\powershell\Scripts\eventlogs.htm
   
-
 ## If there is a result put the HTML file together.
     If ($Result -ne $null)
   {
@@ -142,12 +134,12 @@ Do{
         Clear-Variable MemUsage
         Clear-Variable CpuUsage
         Clear-Variable DiskUsage
-    }
-
+    #}
+	{
 
 ## If there is a result put the HTML file together.
     If ($Result -ne $null)
-    {
+   }
         $HTML = '<style type="text/css">
                 p {font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;font-size:14px}
                 p {color:#ffffff;}
@@ -292,9 +284,9 @@ Do{
         }
 
 #>
-
+<#
 do{
-    #$ServerName = Import-Csv -Path "C:\Users\mallee\Desktop\importer0.csv" -Delimiter ";"
+    $ServerName = Import-txt -Path "C:\Users\mallee\Desktop\importer0.csv" -Delimiter ";"
     $ping= new-object System.Net.NetworkInformation.Ping
     start-sleep -Seconds 60
 } until ($RefreshTime)
@@ -302,6 +294,22 @@ do{
 
 ## This will keep refreshing every "2" minutes and time option is not configured, stop the loop.
 Until ($RefreshTime -eq $null)
+#>
+
+do{
+    $ServerName = Import-txt -Path "C:\inyayam_scripts\Checkservices\report\report.htm"
+    $ping= new-object System.Net.NetworkInformation.Ping
+    start-sleep -Seconds 60
+} until ($RefreshTime)
+    
+## This will keep refreshing every "2" minutes and time option is not configured, stop the loop.
+Until ($RefreshTime -eq $null)
+
+
+
+
+
+
         
             
 ## End

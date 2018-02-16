@@ -7,6 +7,7 @@
 # Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 # Script will look for list of Windows Servers and create status applications services report monitor
 # You can add list servers + services to the text files (Server.txt & Services.txt)
+# The following command to run the script .\CheckServiceStatus.ps1 -RefreshTime 20
 
 ############################Define Server & Services Variable ###############
 $ServerList = Get-Content ".\Server.txt"
@@ -18,7 +19,9 @@ $ServicesList = Get-Content ".\Services.txt"
 $report = ".\report\report.htm" 
 
 ##############################################################################
-
+""
+"=== S T A R T  R E P O R T ==="
+""
 $checkrep = Test-Path ".\report\report.htm" 
 
 If ($checkrep -like "True")
@@ -32,11 +35,13 @@ Remove-Item ".\report\report.htm"
 New-Item ".\report\report.htm" -type file
 
 ################################ADD HTML Content#############################
+#Add-Content $report "date"
+$d=get-date
 
 Add-Content $report "<html>" 
 Add-Content $report "<head>" 
 Add-Content $report "<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'>" 
-Add-Content $report '<title>Service Status Report</title>' 
+Add-Content $report "<title>Service Status Report</title>$d</u></h2>"
 add-content $report '<STYLE TYPE="text/css">' 
 add-content $report  "<!--" 
 add-content $report  "td {" 
@@ -131,6 +136,21 @@ foreach ($machineName in $serverlist)
 
 }
 
+######################## 
+## Get Uptime
+$UPTIME=Get-WmiObject Win32_OperatingSystem
+$up = [Management.ManagementDateTimeConverter]::ToDateTime($UPTIME.LastBootUpTime) | Out-String
+
+
+## Get Each Processor Utilization
+$arr=@()
+$ProcessorObject=gwmi win32_processor
+foreach($processor in $ProcessorObject)
+{
+   $arr += $processor.Caption
+   $arr += $processor.LoadPercentage
+}
+
 ############################################Call Function#############################################
 
 servicestatus $ServerList $ServicesList
@@ -141,5 +161,16 @@ servicestatus $ServerList $ServicesList
 Add-content $report  "</table>" 
 Add-Content $report "</body>" 
 Add-Content $report "</html>" 
+
+
+do{
+    $ServerName = Import-txt -Path "C:\inyayam_scripts\Checkservices\report\report.htm"
+    $ping= new-object System.Net.NetworkInformation.Ping
+    start-sleep -Seconds 60
+} until ($RefreshTime)
+    
+## This will keep refreshing every "2" minutes and time option is not configured, stop the loop.
+Until ($RefreshTime -eq $null)
+
 
 ## End
