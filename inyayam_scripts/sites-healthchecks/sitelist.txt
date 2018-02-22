@@ -1,0 +1,53 @@
+! List applications url's
+! PRD
+!
+PRD Bamboo https://pmtbamboo.honeywell.com/
+PRD Bitbucket https://pmtbitbucket.honeywell.com/
+PRD Confluence https://pmtconfluence.honeywell.com/
+PRD Crowd https://pmtcrowd.honeywell.com:8444/crowd/
+PRD Crucible https://pmtcrucible.honeywell.com/
+PRD Ham https://pmtham.honeywell.com/Login
+PRD Jama https://pmtjama.honeywell.com/contour/
+PRD Jira https://pmtjira.honeywell.com/
+PRD JIHSync01 https://pmtjihsync01.honeywell.com:9080/sync/
+PRD JIHSync02 https://pmtjihsync02.honeywell.com:9080/sync/
+!
+! QA
+!
+QA Bamboo https://pmtqabamboo.honeywell.com/
+QA Bitbucket https://pmtqabitbucket.honeywell.com/
+QA Confluence https://pmtqaconfluence.honeywell.com/
+QA Crowd https://pmtqacrowd.honeywell.com:8444/crowd/
+QA Crucible https://pmtqacrucible.honeywell.com/
+QA Ham https://pmtqaham.honeywell.com/Login
+QA Jama https://pmtqajama.honeywell.com/contour/
+QA Jira https://pmtqajira.honeywell.com/
+QA JIHSync01 https://pmtqasync01.honeywell.com:9080/sync/
+QA JIHSync02 https://pmtqasync02.honeywell.com:9080/sync/
+!
+! EA
+!
+!
+! DEV
+!
+DEV Bamboo https://pmtdevbamboo.honeywell.com/
+DEV Bitbucket https://pmtdevbitbucket.honeywell.com/
+DEV Confluence https://pmtdevconfluence.honeywell.com/
+DEV Crowd https://de08u1675.honeywell.com:8444/crowd/
+DEV Crucible https://pmtdevcrucible.honeywell.com/
+DEV Ham https://de08u1675.honeywell.com:8445/Login
+DEV Jama https://pmtdevjama.honeywell.com/contour/
+DEV Jira https://pmtdevjira.honeywell.com/
+DEV JIHSync01 https://pmtdevsync01.honeywell.com:9080/sync/
+!
+! STG
+!
+STG Bamboo https://pmtstgbamboo.honeywell.com/
+STG Bitbucket https://pmtstgbitbucket.honeywell.com/
+STG Confluence https://pmtstgconfluence.honeywell.com/
+STG Crowd https://pmtstgbamboo.honeywell.com:8444/crowd/
+STG Crucible https://pmtstgcrucible.honeywell.com/
+STG Ham https://pmtstgham.honeywell.com:8445/
+STG Jama https://pmtstgjama.honeywell.com/contour/
+STG Jira https://pmtstgjira.honeywell.com/
+STG JIHSync01 https://pmtstgsync01.honeywell.com:9080/sync/#/login
